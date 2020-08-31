@@ -1,0 +1,59 @@
+# my global config
+global:
+  scrape_interval:     15s # This scrapes targets every 15 seconds.
+  evaluation_interval: 15s
+
+  external_labels:
+      monitor: 'pilz-project'
+
+# This loads and evaluates rules in the alert file(s) every 'evaluation_interval' seconds.
+rule_files:
+  - 'alert.rules'
+
+# alert
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets:
+      - "alertmanager:9093"
+
+# The following is the scrape configuration containing the endpoints to scrape:
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+
+  - job_name: 'prometheus'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+         - targets: ['localhost:9090']
+
+
+  - job_name: 'cadvisor'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    dns_sd_configs:
+    - names:
+      - 'tasks.cadvisor'
+      type: 'A'
+      port: 8080
+    static_configs:
+         - targets: ['cadvisor:8080']
+
+  - job_name: 'nginx-exporter'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    dns_sd_configs:
+    - names:
+      - 'tasks.nginx-exporter'
+      type: 'A'
+      port: 9113
+
+    static_configs:
+         - targets: ['nginx-exporter:9113']
